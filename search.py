@@ -87,50 +87,85 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
     "*** YOUR CODE HERE ***"
-    frontier = util.Stack()
-    frontier.push((problem.getStartState(), []))
-    explored = set()
-    explored.add(problem.getStartState())
-    while not frontier.isEmpty():
-        node = frontier.pop()
-        pos = node[0]
-        res = node[1]
-        explored.add(pos)
-        if problem.isGoalState(pos):
-            return res
-        for child in problem.getSuccessors(pos):
-            if child[0] not in explored:
-                act = child[1]
-                newRes = list(res)
-                newRes.append(act)
-                frontier.push((child[0], newRes))
+
+    stack = util.Stack()
+    visited = set()
+
+    stack.push((problem.getStartState(), []))
+
+    while not stack.isEmpty():
+        node = stack.pop()
+
+        if problem.isGoalState(node[0]):
+            return node[1]
+
+        if node[0] in visited:
+            continue
+        else:
+            visited.add(node[0])
+            children = problem.getSuccessors(node[0])
+
+            for i in range(len(children)):
+                path = list(node[1])
+                path.append(children[i][1])
+                stack.push((children[i][0], path))
+    return []
     # util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    frontier = util.Queue()
-    frontier.push((problem.getStartState(), []))
-    explored = set()
-    explored.add(problem.getStartState())
-    while not frontier.isEmpty():
-        node = frontier.pop()
-        pos = node[0]
-        res = node[1]
-        if problem.isGoalState(pos):
-            return res
-        for child in problem.getSuccessors(pos):
-            if child[0] not in explored:
-                explored.add(child[0])
-                act = child[1]
-                newRes = list(res)
-                newRes.append(act)
-                frontier.push((child[0], newRes))
+
+    queue = util.Queue()
+    visited = set()
+
+    queue.push((problem.getStartState(), []))
+
+    while not queue.isEmpty():
+        node = queue.pop()
+
+        if problem.isGoalState(node[0]):
+            return node[1]
+
+        if node[0] in visited:
+            continue
+        else:
+            visited.add(node[0])
+            children = problem.getSuccessors(node[0])
+
+            for i in range(len(children)):
+                path = list(node[1])
+                path.append(children[i][1])
+                queue.push((children[i][0], path))
+    return []
+
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    queue = util.PriorityQueue()
+    visited = set()
+
+    startState = problem.getStartState()
+    queue.push((startState, []), problem.getCostOfActions([]))
+
+    while not queue.isEmpty():
+        node = queue.pop()
+
+        if problem.isGoalState(node[0]):
+            return node[1]
+
+        if node[0] in visited:
+            continue
+        else:
+            visited.add(node[0])
+            children = problem.getSuccessors(node[0])
+
+            for i in range(len(children)):
+                path = list(node[1])
+                path.append(children[i][1])
+                queue.push((children[i][0], path), problem.getCostOfActions(path))
+    return []
 
 def nullHeuristic(state, problem=None):
     """
