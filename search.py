@@ -99,9 +99,7 @@ def depthFirstSearch(problem):
         if problem.isGoalState(node[0]):
             return node[1]
 
-        if node[0] in visited:
-            continue
-        else:
+        if not node[0] in visited:
             visited.add(node[0])
             children = problem.getSuccessors(node[0])
 
@@ -127,9 +125,7 @@ def breadthFirstSearch(problem):
         if problem.isGoalState(node[0]):
             return node[1]
 
-        if node[0] in visited:
-            continue
-        else:
+        if not node[0] in visited:
             visited.add(node[0])
             children = problem.getSuccessors(node[0])
 
@@ -155,9 +151,7 @@ def uniformCostSearch(problem):
         if problem.isGoalState(node[0]):
             return node[1]
 
-        if node[0] in visited:
-            continue
-        else:
+        if not node[0] in visited:
             visited.add(node[0])
             children = problem.getSuccessors(node[0])
 
@@ -177,7 +171,30 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    queue = util.PriorityQueue()
+    visited = set()
+
+    startState = problem.getStartState()
+    heuristicVal = heuristic(startState, problem)
+    cost = problem.getCostOfActions([]) + heuristicVal
+    queue.push((startState, []), cost)
+
+    while not queue.isEmpty():
+        node = queue.pop()
+
+        if problem.isGoalState(node[0]):
+            return node[1]
+
+        if not node[0] in visited:
+            visited.add(node[0])
+            children = problem.getSuccessors(node[0])
+
+            for i in range(len(children)):
+                path = list(node[1])
+                path.append(children[i][1])
+                queue.push((children[i][0], path), problem.getCostOfActions(path)
+                           + heuristic(children[i][0], problem))
+    return []
 
 
 # Abbreviations
