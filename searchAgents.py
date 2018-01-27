@@ -288,6 +288,11 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
+        self.top, self.right = self.walls.height - 2, self.walls.width - 2
+        self.leftCorner = False
+        self.rightCorner = False
+        self.bottomLeftCorner = False
+        self.thirdCorner = False
 
     def getStartState(self):
         """
@@ -295,14 +300,16 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        return (self.startingPosition, (False), (False), (False), (False))
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        return state[1] and state[2] and state[3] and state[4]
 
     def getSuccessors(self, state):
         """
@@ -316,16 +323,29 @@ class CornersProblem(search.SearchProblem):
         """
 
         successors = []
+
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             # Add a successor state to the successor list if the action is legal
             # Here's a code snippet for figuring out whether a new position hits a wall:
-            #   x,y = currentPosition
-            #   dx, dy = Actions.directionToVector(action)
-            #   nextx, nexty = int(x + dx), int(y + dy)
-            #   hitsWall = self.walls[nextx][nexty]
+            currentPosition, corner1, corner2, corner3, corner4 = state
+            x,y = currentPosition
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            hitsWall = self.walls[nextx][nexty]
 
-            "*** YOUR CODE HERE ***"
+            if not hitsWall:
+                nextPosition = (nextx, nexty)
+                if nextPosition == (1,1):
+                    corner3 = True
+                if nextPosition == (1, self.top):
+                    corner1 = True
+                if nextPosition == (self.right, 1):
+                    corner4 = True
+                if nextPosition == (self.right, self.top):
+                    corner2 = True
+                nextState = (nextPosition, corner1, corner2, corner3, corner4)
 
+                successors.append((nextState, action, 1))
         self._expanded += 1 # DO NOT CHANGE
         return successors
 
