@@ -88,18 +88,22 @@ def depthFirstSearch(problem):
     """
     "*** YOUR CODE HERE ***"
 
+    # call the graph search method with Stack as data structure
     return graphSearch(problem, util.Stack)
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
 
+    # call the graph search method with Queue as data structure
     return graphSearch(problem, util.Queue)
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
 
+    # call the graph search method with PriorityQueue as data structure
+    # and the heuristic as nullHeuristuc (default)
     return graphSearch(problem, util.PriorityQueue)
 
 def nullHeuristic(state, problem=None):
@@ -113,11 +117,13 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
 
+    # call the graph search method with PriorityQueue as data structure
+    # and with given heuristic function
     return graphSearch(problem, util.PriorityQueue, heuristic)
 
 def graphSearch(problem, dataStructure, heuristic=nullHeuristic):
 
-    # use the given datastructure (stack, queue) to handle fringe
+    # use the given data structure (stack, queue or priority queue) to handle fringe
     # visited - a set to keep track of visited positions
     fringe = dataStructure()
     visited = set()
@@ -136,7 +142,7 @@ def graphSearch(problem, dataStructure, heuristic=nullHeuristic):
         if problem.isGoalState(state[0]):
             return state[1]
 
-        # mark the position as visited and push successor to stack
+        # mark the position as visited and push successors to stack as a ((successor, path), cost)
         if not state[0] in visited:
             visited.add(state[0])
             successor = problem.getSuccessors(state[0])

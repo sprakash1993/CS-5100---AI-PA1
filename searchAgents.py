@@ -288,6 +288,7 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
+
         self.top, self.right = self.walls.height - 2, self.walls.width - 2
 
     def getStartState(self):
@@ -297,7 +298,10 @@ class CornersProblem(search.SearchProblem):
         """
         "*** YOUR CODE HERE ***"
 
-        return (self.startingPosition, (False), (False), (False), (False))
+        # State Representation - (Position, isCorner1Visited, isCorner2Visited, isCorner3Visited, isCorner4Visited)
+        # Position is represented as (x, y) and then we have 4 boolean values to track
+        # if each of the 4 corners are visited
+        return (self.startingPosition, False, False, False, False)
 
     def isGoalState(self, state):
         """
@@ -305,6 +309,7 @@ class CornersProblem(search.SearchProblem):
         """
         "*** YOUR CODE HERE ***"
 
+        # if all 4 corners are visited, then it is goal state
         return state[1] and state[2] and state[3] and state[4]
 
     def getSuccessors(self, state):
@@ -329,9 +334,10 @@ class CornersProblem(search.SearchProblem):
             nextx, nexty = int(x + dx), int(y + dy)
             hitsWall = self.walls[nextx][nexty]
 
+            # check if next position is one of the 4 corners and update the state accordingly
             if not hitsWall:
                 nextPosition = (nextx, nexty)
-                if nextPosition == (1,1):
+                if nextPosition == (1, 1):
                     corner1 = True
                 if nextPosition == (1, self.top):
                     corner2 = True
@@ -340,8 +346,8 @@ class CornersProblem(search.SearchProblem):
                 if nextPosition == (self.right, self.top):
                     corner4 = True
                 nextState = (nextPosition, corner1, corner2, corner3, corner4)
-
                 successors.append((nextState, action, 1))
+
         self._expanded += 1 # DO NOT CHANGE
         return successors
 
@@ -377,13 +383,19 @@ def cornersHeuristic(state, problem):
 
     "*** YOUR CODE HERE ***"
 
-    unvisited= []
+    unvisited = []
     node = state[0]
     heuristic = 0
 
+    # Find all the unvisited corners from the state
     for i in range(1, 5):
         if not state[i]:
             unvisited.append(corners[i-1])
+
+    # Find the sum of minimum distance between each of the unvisited corner
+    # and use is as heuristic. It is admissible and consistent because the same corner
+    # will be chosen every time, for the same condition.
+    # it will return 0 for the goal state (never negative)
 
     while unvisited:
         minDistance = 99999
@@ -392,7 +404,6 @@ def cornersHeuristic(state, problem):
             if dist < minDistance:
                 minDistance = dist
                 minDistanceCorner = corner
-
         heuristic += minDistance
         node = minDistanceCorner
         unvisited.remove(minDistanceCorner)
@@ -493,12 +504,20 @@ def foodHeuristic(state, problem):
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
 
-    food = foodGrid.asList()
-    if len(food) == 0:
+    # We use the maximum distance between the current position and
+    # the available food and use it as a heuristic.
+    # We return 0 for the goal state. (Never negative)
+    # We use the available mazeDistance method to find the
+    # distance between current position and food, which is consistent.
+
+    foodList = foodGrid.asList()
+
+    # return 0 if there are no food (goal state)
+    if len(foodList) == 0:
         return 0
 
     heuristic = 0
-    for food in food:
+    for food in foodList:
         distance = mazeDistance(position, food, problem.startingGameState)
         if distance > heuristic:
             heuristic = distance
@@ -535,30 +554,9 @@ class ClosestDotSearchAgent(SearchAgent):
 
         "*** YOUR CODE HERE ***"
 
+        # use the already available bfs as the search method as it returns shortest path
         return search.breadthFirstSearch(problem)
 
-        # copied from bfs method of search.py
-
-        # queue = util.Queue()
-        # visited = set()
-        #
-        # queue.push((problem.getStartState(), []))
-        #
-        # while not queue.isEmpty():
-        #     node = queue.pop()
-        #
-        #     if problem.isGoalState(node[0]):
-        #         return node[1]
-        #
-        #     if not node[0] in visited:
-        #         visited.add(node[0])
-        #         children = problem.getSuccessors(node[0])
-        #
-        #         for i in range(len(children)):
-        #             path = list(node[1])
-        #             path.append(children[i][1])
-        #             queue.push((children[i][0], path))
-        # return []
         #util.raiseNotDefined()
 
 class AnyFoodSearchProblem(PositionSearchProblem):
@@ -595,7 +593,9 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         x,y = state
 
         "*** YOUR CODE HERE ***"
-        return self.food[x][y] == True
+
+        # return true if the current position has food
+        return self.food[x][y] is True
         #util.raiseNotDefined()
 
 def mazeDistance(point1, point2, gameState):
