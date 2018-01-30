@@ -535,26 +535,30 @@ class ClosestDotSearchAgent(SearchAgent):
 
         "*** YOUR CODE HERE ***"
 
-        queue = util.Queue()
-        visited = set()
+        return search.breadthFirstSearch(problem)
 
-        queue.push((problem.getStartState(), []))
+        # copied from bfs method of search.py
 
-        while not queue.isEmpty():
-            node = queue.pop()
-
-            if problem.isGoalState(node[0]):
-                return node[1]
-
-            if not node[0] in visited:
-                visited.add(node[0])
-                children = problem.getSuccessors(node[0])
-
-                for i in range(len(children)):
-                    path = list(node[1])
-                    path.append(children[i][1])
-                    queue.push((children[i][0], path))
-        return []
+        # queue = util.Queue()
+        # visited = set()
+        #
+        # queue.push((problem.getStartState(), []))
+        #
+        # while not queue.isEmpty():
+        #     node = queue.pop()
+        #
+        #     if problem.isGoalState(node[0]):
+        #         return node[1]
+        #
+        #     if not node[0] in visited:
+        #         visited.add(node[0])
+        #         children = problem.getSuccessors(node[0])
+        #
+        #         for i in range(len(children)):
+        #             path = list(node[1])
+        #             path.append(children[i][1])
+        #             queue.push((children[i][0], path))
+        # return []
         #util.raiseNotDefined()
 
 class AnyFoodSearchProblem(PositionSearchProblem):

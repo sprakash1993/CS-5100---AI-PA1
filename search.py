@@ -88,78 +88,19 @@ def depthFirstSearch(problem):
     """
     "*** YOUR CODE HERE ***"
 
-    stack = util.Stack()
-    visited = set()
-
-    stack.push((problem.getStartState(), []))
-
-    while not stack.isEmpty():
-        node = stack.pop()
-
-        if problem.isGoalState(node[0]):
-            return node[1]
-
-        if not node[0] in visited:
-            visited.add(node[0])
-            children = problem.getSuccessors(node[0])
-
-            for i in range(len(children)):
-                path = list(node[1])
-                path.append(children[i][1])
-                stack.push((children[i][0], path))
-    return []
-    # util.raiseNotDefined()
+    return graphSearch(problem, util.Stack)
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
 
-    queue = util.Queue()
-    visited = set()
-
-    queue.push((problem.getStartState(), []))
-
-    while not queue.isEmpty():
-        node = queue.pop()
-
-        if problem.isGoalState(node[0]):
-            return node[1]
-
-        if not node[0] in visited:
-            visited.add(node[0])
-            children = problem.getSuccessors(node[0])
-
-            for i in range(len(children)):
-                path = list(node[1])
-                path.append(children[i][1])
-                queue.push((children[i][0], path))
-    return []
-
+    return graphSearch(problem, util.Queue)
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    queue = util.PriorityQueue()
-    visited = set()
 
-    startState = problem.getStartState()
-    queue.push((startState, []), problem.getCostOfActions([]))
-
-    while not queue.isEmpty():
-        node = queue.pop()
-
-        if problem.isGoalState(node[0]):
-            return node[1]
-
-        if not node[0] in visited:
-            visited.add(node[0])
-            children = problem.getSuccessors(node[0])
-
-            for i in range(len(children)):
-                path = list(node[1])
-                path.append(children[i][1])
-                queue.push((children[i][0], path), problem.getCostOfActions(path))
-    return []
+    return graphSearch(problem, util.PriorityQueue)
 
 def nullHeuristic(state, problem=None):
     """
@@ -171,31 +112,43 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    queue = util.PriorityQueue()
+
+    return graphSearch(problem, util.PriorityQueue, heuristic)
+
+def graphSearch(problem, dataStructure, heuristic=nullHeuristic):
+
+    # use the given datastructure (stack, queue) to handle fringe
+    # visited - a set to keep track of visited positions
+    fringe = dataStructure()
     visited = set()
 
+    # push initial state of the problem to stack
     startState = problem.getStartState()
-    heuristicVal = heuristic(startState, problem)
-    cost = problem.getCostOfActions([]) + heuristicVal
-    queue.push((startState, []), cost)
+    if dataStructure == util.Stack or dataStructure == util.Queue:
+        fringe.push((startState, []))
+    elif dataStructure == util.PriorityQueue:
+        fringe.push((startState, []), problem.getCostOfActions([]) + heuristic(startState, problem))
 
-    while not queue.isEmpty():
-        node = queue.pop()
+    while not fringe.isEmpty():
+        state = fringe.pop()
 
-        if problem.isGoalState(node[0]):
-            return node[1]
+        # check if it is goal state
+        if problem.isGoalState(state[0]):
+            return state[1]
 
-        if not node[0] in visited:
-            visited.add(node[0])
-            children = problem.getSuccessors(node[0])
-
-            for i in range(len(children)):
-                path = list(node[1])
-                path.append(children[i][1])
-                queue.push((children[i][0], path), problem.getCostOfActions(path)
-                           + heuristic(children[i][0], problem))
+        # mark the position as visited and push successor to stack
+        if not state[0] in visited:
+            visited.add(state[0])
+            successor = problem.getSuccessors(state[0])
+            for i in range(len(successor)):
+                path = list(state[1])
+                path.append(successor[i][1])
+                if dataStructure == util.Stack or dataStructure == util.Queue:
+                    fringe.push((successor[i][0], path))
+                elif dataStructure == util.PriorityQueue:
+                    fringe.push((successor[i][0], path), problem.getCostOfActions(path)
+                                + heuristic(successor[i][0], problem))
     return []
-
 
 # Abbreviations
 bfs = breadthFirstSearch
